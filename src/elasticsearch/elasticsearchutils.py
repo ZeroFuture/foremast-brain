@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime, timezone
 import logging
+from retrying import retry
 
 
 
@@ -145,6 +146,41 @@ payload_search_status_list3 =  {
 
 headers = {'Content-Type': 'application/json'}
 
+
+
+
+
+# execute ES query with retry
+@retry(wait_exponential_multiplier=1000, wait_exponential_max=10000, stop_max_attempt_number=RETRY_COUNT)
+def execute(url, query):
+    resp = requests.post(url, query, headers=headers, timeout=10)
+    if resp.status_code == 200:
+        return resp.text
+    logger.error('Error: failed to execute query {}'.format(query))
+    raise Exception("Retry ES query")
+
+
+#### For Sen
+
+def saveReason(jobId, logTime, logContent):
+    #TODO:
+    return True
+    
+def saveModel(jobId, modelParameters={}, modelData={}):  
+    #TODO: new elastic search index with model parameter and model data column, 
+    #Please add both model_parameter change timestampe and model data timestamp 
+    return True
+    
+    
+def getModelParameters(jobId):
+    #return stored model parameters 
+    return {} 
+
+def getModelData(jobId):
+    #return stored model data
+    return {}  
+    
+      
 
 
 
